@@ -1,0 +1,45 @@
+{
+  "schema_version": "0.2-experimental",
+  "extension_id": "org.vllm-hust.ascend-mapped-kv-offload",
+  "extension_version": "0.1.0.dev0",
+  "kind": "runtime_bridge",
+  "host": {
+    "provider": "vllm",
+    "name": "vllm-ascend",
+    "version_range": ">=0.23,<0.24"
+  },
+  "runtime": {
+    "type": "python",
+    "process_scope": "vllm-ascend-worker",
+    "isolation": "trusted_in_process"
+  },
+  "lifecycle_owner": "vllm",
+  "protocols": [
+    {"name": "vllm.kv-offload.spec", "version_range": null},
+    {"name": "vllm.ascend.mapped-host-memory", "version_range": null}
+  ],
+  "implementation": [
+    {
+      "type": "python_module",
+      "module": "vllm_ascend_mapped_kv_offload_hust",
+      "object": "MappedKvOffloadDescriptor",
+      "status": "import_only"
+    }
+  ],
+  "requires_services": [],
+  "components": [
+    {
+      "component_id": "mapped-kv-offload",
+      "contracts": ["vllm.ascend.kv-offload.mapped-host.v1"],
+      "execution_planes": ["worker", "native", "device"],
+      "isolation": "trusted_in_process",
+      "implementation_ref": "vllm_ascend_mapped_kv_offload_hust:MappedKvOffloadDescriptor",
+      "permissions": ["device_access", "shared_memory"]
+    }
+  ],
+  "activation": {
+    "entry_points": [],
+    "environment": {},
+    "additional_config": {}
+  }
+}
